@@ -17,6 +17,7 @@ var Game = {
 Game.startLevel = function (levelNumber) {
   Game.levelNumber = levelNumber;
   Level.build(levelNumber);
+   Crumble.reset();
   Player.reset();
   Game.mode = "playing";
   Game.showMessage("");
