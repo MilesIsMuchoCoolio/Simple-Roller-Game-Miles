@@ -38,7 +38,7 @@ Game.update = function () {
 
   // If we are not playing, nothing moves. We just wait for R.
   if (Game.mode !== "playing") { return; }
-
+Crumble.update();
   Player.update();
 
   if (Player.isDead()) {
