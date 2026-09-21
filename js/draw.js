@@ -41,9 +41,8 @@ Draw.everything = function () {
   // 2. shift everything left so the camera looks like it moved right
   ctx.save();
   ctx.translate(-Draw.cameraX, 0);
-
   Draw.world();
-   Crumble.draw();
+  Crumble.draw();
   Draw.player();
 
   ctx.restore();
