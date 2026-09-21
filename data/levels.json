@@ -17,32 +17,19 @@
         "finish"
       ]
     },
-    {
-      "name": "Level 2 - Watch Your Step",
-      "pieces": [
-        "start",
-        "spikes",
-        "gap",
-        "step",
-        "spikepit",
-        "platform",
-        "gap",
-        "flat",
-        "finish"
-      ]
-    },
-  ]
-  "crumble": [  
-  "........",  
-  "........",  
-  "........",  
-  "........",  
-  "........",  
-  "........",  
-  "..cccc..",  
-  "........",  
-  "###..###",  
-  "###..###"  
-]  
-
-},
+        {  
+      "name": "Level 2 - Watch Your Step",  
+      "pieces": [  
+        "start",  
+        "spikes",  
+        "gap",  
+        "step",  
+        "spikepit",  
+        "platform",  
+        "gap",  
+        "flat",  
+        "finish"  
+      ]  
+    }  
+  ]  
+}  
