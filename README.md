@@ -11,6 +11,9 @@ That is the whole game. Everything else is yours to add.
 Push your changes, then open your GitHub Pages link.
 Press `Ctrl + Shift + R` to hard refresh, or you will see the old version.
 
+For local development, run `python3 server.py` from the project folder, then
+open `http://127.0.0.1:8000` in your browser.
+
 - LEFT / RIGHT arrow - roll
 - SPACE or UP arrow - jump
 - R - restart the level
@@ -69,6 +72,6 @@ that name in a level.
   That is on purpose. Boxes are easier to check and nobody can tell.
 - Every file is loaded in order at the bottom of `index.html`.
   If you add a new file, add it to that list too.
-- The level data is loaded with `fetch()`, which only works over http.
-  Use your GitHub Pages link. Opening `index.html` straight off your
-  hard drive will not load the levels.
+- The level data is loaded with `fetch()`, so the game must be opened over
+  HTTP. Use GitHub Pages or the local server command above. Opening
+  `index.html` straight off your hard drive will not load the levels.
