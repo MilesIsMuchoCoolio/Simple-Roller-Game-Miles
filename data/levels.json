@@ -8,6 +8,7 @@
       "pieces": [
         "start",
         "crumble",
+        "crumble_bridge",
         "flat",
         "gap",
         "flat",
@@ -22,14 +23,31 @@
       "pieces": [  
         "start",  
         "spikes",  
+      "spikes_wide",  
         "gap",  
         "step",  
         "spikepit",  
+      "crumble_bridge",  
         "platform",  
         "gap",  
         "flat",  
         "finish"  
       ]  
+    },
+    {
+      "name": "Level 3 - Crumble Run",
+      "pieces": [
+        "start",
+        "crumble_bridge",
+        "spikes_wide",
+        "gap",
+        "crumble",
+        "wallstep",
+        "spikepit",
+        "stairs",
+        "crumble_bridge",
+        "finish"
+      ]
     }  
   ]  
 }  

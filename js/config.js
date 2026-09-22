@@ -34,7 +34,7 @@ var CONFIG = {
 
   // --- rules ----------------------------------------------------------
    START_LEVEL: 0,      // which level in data/levels.json to load first
-   CRUMBLE_SHAKE_FRAMES: 120,  
-CRUMBLE_RESPAWN_FRAMES: 180  
+   CRUMBLE_SHAKE_FRAMES: 45,  // how long a crumble block shakes before falling
+   CRUMBLE_RESPAWN_FRAMES: 180
 
 };
