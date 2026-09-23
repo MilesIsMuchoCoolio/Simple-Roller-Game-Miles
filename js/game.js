@@ -1,8 +1,12 @@
-var Game = { mode: "playing", levelNumber: 0, score: 0 };
+var Game = {
+  mode: "playing",
+  levelNumber: 0,
+  score: 0
+};
 
-Game.startLevel = function (number) {
-  Game.levelNumber = number;
-  Level.build(number);
+Game.startLevel = function (levelNumber) {
+  Game.levelNumber = levelNumber;
+  Level.build(levelNumber);
   Crumble.reset();
   Combat.reset();
   Player.reset();
@@ -21,9 +25,7 @@ Game.updateHUD = function () {
   var score = document.getElementById("score");
   if (!score) return;
   var reloadText = Combat.reloadTimer > 0 ? " | RELOADING" : "";
-  // Coins are an ongoing score; there is intentionally no maximum or /total.
-  score.textContent = "Coins: " + Game.score +
-    " | Ammo: " + Combat.ammo + "/" + Combat.reserve + reloadText;
+  score.textContent = "Coins: " + Game.score + " | Ammo: " + Combat.ammo + "/" + Combat.reserve + reloadText;
 };
 
 Game.update = function () {
@@ -31,19 +33,23 @@ Game.update = function () {
     Game.startLevel(Game.levelNumber);
     return;
   }
+
   if (Game.mode !== "playing") return;
 
   Player.update();
-  Player.collectCoins();
   Combat.update();
   Crumble.update();
 
   if (Player.isDead()) {
     Game.mode = "dead";
     Game.showMessage("You were hit! Press R to restart.");
-  } else if (Player.hasWon()) {
+    return;
+  }
+
+  if (Player.hasWon()) {
     Game.mode = "won";
     Game.showMessage("You made it! Press R to play again.");
+    return;
   }
 };
 

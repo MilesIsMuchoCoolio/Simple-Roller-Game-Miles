@@ -1,6 +1,7 @@
 var Combat = {
   enemies: [],
   bullets: [],
+  enemyBullets: [],
   ammo: 0,
   reserve: 0,
   reloadTimer: 0,
@@ -10,6 +11,7 @@ var Combat = {
 Combat.reset = function () {
   Combat.enemies = [];
   Combat.bullets = [];
+  Combat.enemyBullets = [];
   Combat.ammo = CONFIG.MAGAZINE_SIZE;
   Combat.reserve = CONFIG.START_RESERVE_AMMO;
   Combat.reloadTimer = 0;
@@ -21,8 +23,11 @@ Combat.reset = function () {
         Combat.enemies.push({
           x: col * CONFIG.TILE + 5,
           y: row * CONFIG.TILE + 5,
-          vy: 0,
-          health: CONFIG.ENEMY_HEALTH
+          direction: -1,
+          alive: true,
+          shootTimer: 0,
+          health: CONFIG.ENEMY_HEALTH,
+          vy: 0
         });
         Combat.setTile(col, row, ".");
       }
@@ -32,18 +37,25 @@ Combat.reset = function () {
 
 Combat.setTile = function (col, row, character) {
   var line = Level.grid[row];
-  Level.grid[row] = line.slice(0, col) + character + line.slice(col + 1);
+  Level.grid[row] = line.substring(0, col) + character + line.substring(col + 1);
 };
 
 Combat.aimPoint = function () {
   return { x: Input.mouseX + Draw.cameraX, y: Input.mouseY };
 };
 
+Combat.playerHit = function (x, y, w, h) {
+  if (Combat.overlaps(Player.x, Player.y, CONFIG.PLAYER_SIZE, CONFIG.PLAYER_SIZE, x, y, w, h)) {
+    Player.enemyHit = true;
+  }
+};
+
 Combat.update = function () {
   if (Combat.reloadTimer > 0) {
-    Combat.reloadTimer--;
+    Combat.reloadTimer -= 1;
     if (Combat.reloadTimer === 0) {
-      var loaded = Math.min(CONFIG.MAGAZINE_SIZE - Combat.ammo, Combat.reserve);
+      var needed = CONFIG.MAGAZINE_SIZE - Combat.ammo;
+      var loaded = Math.min(needed, Combat.reserve);
       Combat.ammo += loaded;
       Combat.reserve -= loaded;
     }
@@ -51,8 +63,8 @@ Combat.update = function () {
     Combat.reloadTimer = CONFIG.RELOAD_FRAMES;
   }
 
-  var shootPressed = Input.shoot && !Combat.shootWasDown;
-  if (shootPressed && Combat.reloadTimer === 0 && Combat.ammo > 0) {
+  var pressed = Input.shoot && !Combat.shootWasDown;
+  if (pressed && Combat.reloadTimer === 0 && Combat.ammo > 0) {
     var target = Combat.aimPoint();
     var startX = Player.x + CONFIG.PLAYER_SIZE / 2;
     var startY = Player.y + CONFIG.PLAYER_SIZE / 2;
@@ -65,7 +77,7 @@ Combat.update = function () {
       vx: dx / length * CONFIG.BULLET_SPEED,
       vy: dy / length * CONFIG.BULLET_SPEED
     });
-    Combat.ammo--;
+    Combat.ammo -= 1;
   }
   Combat.shootWasDown = Input.shoot;
 
@@ -74,7 +86,7 @@ Combat.update = function () {
     bullet.x += bullet.vx;
     bullet.y += bullet.vy;
 
-    if (Collide.hitsSolid(bullet.x, bullet.y, 6, 6) ||
+    if (Collide.hitsSolid(bullet.x, bullet.y, 8, 4) ||
         bullet.x < 0 || bullet.x > Level.pixelWidth() ||
         bullet.y < 0 || bullet.y > CONFIG.CANVAS_H) {
       Combat.bullets.splice(i, 1);
@@ -83,12 +95,11 @@ Combat.update = function () {
 
     for (var j = Combat.enemies.length - 1; j >= 0; j--) {
       var enemy = Combat.enemies[j];
-      if (Combat.overlaps(bullet.x, bullet.y, 6, 6,
-          enemy.x, enemy.y, CONFIG.ENEMY_SIZE, CONFIG.ENEMY_SIZE)) {
-        enemy.health--;
+      if (enemy.alive && Combat.overlaps(bullet.x, bullet.y, 8, 4, enemy.x, enemy.y, CONFIG.ENEMY_SIZE, CONFIG.ENEMY_SIZE)) {
+        enemy.health -= 1;
         Combat.bullets.splice(i, 1);
         if (enemy.health <= 0) {
-          Combat.enemies.splice(j, 1);
+          enemy.alive = false;
           Game.score += 5;
         }
         break;
@@ -96,33 +107,67 @@ Combat.update = function () {
     }
   }
 
-  // Enemies only do two things: fall onto the ground and slowly walk toward you.
   for (var e = 0; e < Combat.enemies.length; e++) {
     var foe = Combat.enemies[e];
-    var size = CONFIG.ENEMY_SIZE;
+    if (!foe.alive) { continue; }
 
-    // Gravity keeps the enemy standing on platforms instead of floating.
+    foe.shootTimer = Math.max(0, foe.shootTimer - 1);
+
+    if (Math.abs(Player.x - foe.x) < 420 && Math.abs(Player.y - foe.y) < 220 && foe.shootTimer === 0) {
+      var aimX = Player.x + CONFIG.PLAYER_SIZE / 2 - (foe.x + CONFIG.ENEMY_SIZE / 2);
+      var aimY = Player.y + CONFIG.PLAYER_SIZE / 2 - (foe.y + CONFIG.ENEMY_SIZE / 2);
+      var enemyLength = Math.sqrt(aimX * aimX + aimY * aimY) || 1;
+
+      var spreadX = (Math.random() - 0.5) * 40;
+      var spreadY = (Math.random() - 0.5) * 40;
+
+      Combat.enemyBullets.push({
+        x: foe.x + CONFIG.ENEMY_SIZE / 2,
+        y: foe.y + CONFIG.ENEMY_SIZE / 2,
+        vx: ((aimX + spreadX) / enemyLength) * CONFIG.ENEMY_BULLET_SPEED,
+        vy: ((aimY + spreadY) / enemyLength) * CONFIG.ENEMY_BULLET_SPEED
+      });
+      foe.shootTimer = CONFIG.ENEMY_SHOOT_COOLDOWN;
+    }
+
     foe.vy = Math.min(CONFIG.MAX_FALL, foe.vy + CONFIG.GRAVITY);
-    var verticalStep = foe.vy > 0 ? 1 : -1;
-    var verticalDistance = Math.abs(foe.vy);
-    for (var v = 0; v < verticalDistance; v++) {
-      if (Collide.hitsSolid(foe.x, foe.y + verticalStep, size, size)) {
+    var stepY = foe.vy > 0 ? 1 : -1;
+    for (var py = 0; py < Math.abs(foe.vy); py++) {
+      if (Collide.hitsSolid(foe.x, foe.y + stepY, CONFIG.ENEMY_SIZE, CONFIG.ENEMY_SIZE)) {
         foe.vy = 0;
         break;
       }
-      foe.y += verticalStep;
+      foe.y += stepY;
     }
 
-    // Move slowly toward the player's horizontal position.
-    var direction = Player.x > foe.x ? 1 : (Player.x < foe.x ? -1 : 0);
-    var horizontalStep = direction * CONFIG.ENEMY_SPEED;
-    if (!Collide.hitsSolid(foe.x + horizontalStep, foe.y, size, size)) {
-      foe.x += horizontalStep;
+    var moveDir = Player.x > foe.x ? 1 : -1;
+    var nextX = foe.x + moveDir * CONFIG.ENEMY_SPEED;
+    if (!Collide.hitsSolid(nextX, foe.y, CONFIG.ENEMY_SIZE, CONFIG.ENEMY_SIZE)) {
+      foe.x = nextX;
     }
 
     if (Combat.overlaps(Player.x, Player.y, CONFIG.PLAYER_SIZE, CONFIG.PLAYER_SIZE,
-        foe.x, foe.y, size, size)) {
+        foe.x, foe.y, CONFIG.ENEMY_SIZE, CONFIG.ENEMY_SIZE)) {
       Player.enemyHit = true;
+    }
+  }
+
+  for (var k = Combat.enemyBullets.length - 1; k >= 0; k--) {
+    var enemyBullet = Combat.enemyBullets[k];
+    enemyBullet.x += enemyBullet.vx;
+    enemyBullet.y += enemyBullet.vy;
+
+    if (enemyBullet.x < 0 || enemyBullet.x > Level.pixelWidth() ||
+        enemyBullet.y < 0 || enemyBullet.y > CONFIG.CANVAS_H ||
+        Collide.hitsSolid(enemyBullet.x, enemyBullet.y, 6, 6)) {
+      Combat.enemyBullets.splice(k, 1);
+      continue;
+    }
+
+    if (Combat.overlaps(enemyBullet.x, enemyBullet.y, 6, 6,
+        Player.x, Player.y, CONFIG.PLAYER_SIZE, CONFIG.PLAYER_SIZE)) {
+      Player.enemyHit = true;
+      Combat.enemyBullets.splice(k, 1);
     }
   }
 
@@ -133,8 +178,9 @@ Combat.update = function () {
 Combat.collectAmmo = function () {
   var squares = Collide.squaresUnder(Player.x, Player.y, CONFIG.PLAYER_SIZE, CONFIG.PLAYER_SIZE);
   for (var i = 0; i < squares.length; i++) {
-    if (Level.charAt(squares[i].col, squares[i].row) === "A") {
-      Level.removeCoin(squares[i].col, squares[i].row);
+    var square = squares[i];
+    if (Level.charAt(square.col, square.row) === "A") {
+      Level.removeCoin(square.col, square.row);
       Combat.reserve += CONFIG.MAGAZINE_SIZE;
       return;
     }
@@ -149,8 +195,9 @@ Combat.draw = function () {
   var ctx = Draw.ctx;
   for (var i = 0; i < Combat.enemies.length; i++) {
     var enemy = Combat.enemies[i];
-    ctx.strokeStyle = "#a00020";
-    ctx.fillStyle = "#ef476f";
+    if (!enemy.alive) { continue; }
+    ctx.strokeStyle = "#b00020";
+    ctx.fillStyle = "#ff526f";
     ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.arc(enemy.x + 15, enemy.y + 7, 7, 0, Math.PI * 2);
@@ -175,8 +222,13 @@ Combat.draw = function () {
     ctx.fillRect(enemy.x, enemy.y - 8, 30 * enemy.health / CONFIG.ENEMY_HEALTH, 4);
   }
 
-  ctx.fillStyle = "#222";
+  ctx.fillStyle = "#111111";
   for (var b = 0; b < Combat.bullets.length; b++) {
-    ctx.fillRect(Combat.bullets[b].x, Combat.bullets[b].y, 7, 5);
+    ctx.fillRect(Combat.bullets[b].x, Combat.bullets[b].y, 8, 4);
+  }
+
+  ctx.fillStyle = "#0d3b66";
+  for (var n = 0; n < Combat.enemyBullets.length; n++) {
+    ctx.fillRect(Combat.enemyBullets[n].x, Combat.enemyBullets[n].y, 7, 5);
   }
 };
