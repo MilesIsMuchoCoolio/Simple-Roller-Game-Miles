@@ -1,21 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>ROLLER</title><link rel="stylesheet" href="style.css"></head>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ROLLER</title>
+  <link rel="stylesheet" href="style.css">
+</head>
 <body>
-<h1>ROLLER</h1>
-<canvas id="game" width="800" height="400"></canvas>
-<p id="score" class="score">Coins: 0 | Ammo: 0/0</p>
-<p id="message">Loading...</p>
-<p class="controls">LEFT / RIGHT or A / D to move &middot; SPACE / W to jump &middot; X to shoot &middot; T to reload &middot; R to restart</p>
-<script src="js/config.js"></script>
-<script src="js/input.js"></script>
-<script src="js/level.js"></script>
-<script src="js/collide.js"></script>
-<script src="js/player.js"></script>
-<script src="js/combat.js"></script>
-<script src="js/draw.js"></script>
-<script src="js/crumble.js"></script>
-<script src="js/game.js"></script>
-<script src="js/main.js"></script>
+  <h1>ROLLER</h1>
+  <p id="status" class="status">Initializing...</p>
+
+  <canvas id="game" width="800" height="400"></canvas>
+
+  <p id="message">Loading...</p>
+
+  <p class="controls">
+    LEFT / RIGHT or A / D to move &nbsp;&middot;&nbsp;
+    SPACE or W to jump &nbsp;&middot;&nbsp;
+    X to shoot &nbsp;&middot;&nbsp;
+    T to reload &nbsp;&middot;&nbsp;
+    R to restart
+  </p>
+
+  <script src="js/config.js"></script>
+  <script src="js/input.js"></script>
+  <script src="js/level.js"></script>
+  <script src="js/collide.js"></script>
+  <script src="js/player.js"></script>
+  <script src="js/combat.js"></script>
+  <script src="js/draw.js"></script>
+  <script src="js/crumble.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/main.js"></script>
 </body>
 </html>
