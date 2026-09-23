@@ -5,7 +5,7 @@
    If you want to change how the game LOOKS, this is the only file you
    need. If you want to change how it BEHAVES, this is the wrong file.
 
-   This is a PvZ-inspired lawn defense theme with Crazy Dave energy.
+   This is a bright, PvZ-inspired lawn-defense theme with Crazy Dave vibes.
    ===================================================================== */
 
 var Draw = {
@@ -25,25 +25,25 @@ Draw.updateCamera = function () {
   if (Draw.cameraX < 0) { Draw.cameraX = 0; }
 
   var furthest = Level.pixelWidth() - CONFIG.CANVAS_W;
-  if (furthest < 0) { furthest = 0; }   // level narrower than the screen
+  if (furthest < 0) { furthest = 0; }
   if (Draw.cameraX > furthest) { Draw.cameraX = furthest; }
 };
 
-// Draw one whole frame.
 Draw.everything = function () {
   var ctx = Draw.ctx;
 
-  // 1. fill the background with a sunny garden lawn color
-  ctx.fillStyle = "#d7ef9d";
+  ctx.fillStyle = "#dff7a6";
   ctx.fillRect(0, 0, CONFIG.CANVAS_W, CONFIG.CANVAS_H);
 
-  // little sun accent to make it feel more like a PvZ lawn
-  ctx.fillStyle = "#ffd765";
+  // sunny lawn background accents
+  ctx.fillStyle = "#ffd861";
   ctx.beginPath();
-  ctx.arc(90, 70, 20, 0, Math.PI * 2);
+  ctx.arc(90, 70, 22, 0, Math.PI * 2);
   ctx.fill();
 
-  // 2. shift everything left so the camera looks like it moved right
+  ctx.fillStyle = "rgba(255,255,255,0.18)";
+  ctx.fillRect(0, 0, CONFIG.CANVAS_W, 12);
+
   ctx.save();
   ctx.translate(-Draw.cameraX, 0);
   Draw.world();
@@ -52,12 +52,10 @@ Draw.everything = function () {
   ctx.restore();
 };
 
-// Draw every grid square that is currently on screen.
 Draw.world = function () {
   var ctx = Draw.ctx;
   var size = CONFIG.TILE;
 
-  // only look at the columns that are actually visible. much faster.
   var firstCol = Math.floor(Draw.cameraX / size) - 1;
   var lastCol  = firstCol + Math.ceil(CONFIG.CANVAS_W / size) + 2;
 
@@ -74,12 +72,12 @@ Draw.world = function () {
   }
 };
 
-// A solid block: green garden soil tile with a dark outline.
+// Brighter green garden blocks to fit the PvZ palette.
 Draw.block = function (x, y, size) {
   var ctx = Draw.ctx;
-  ctx.fillStyle = "#b9d86b";
+  ctx.fillStyle = "#8fe15a";
   ctx.fillRect(x, y, size, size);
-  ctx.strokeStyle = "#2d5d2d";
+  ctx.strokeStyle = "#2d6a3b";
   ctx.lineWidth = CONFIG.LINE_WIDTH;
   ctx.strokeRect(x + CONFIG.LINE_WIDTH / 2,
                  y + CONFIG.LINE_WIDTH / 2,
@@ -87,39 +85,46 @@ Draw.block = function (x, y, size) {
                  size - CONFIG.LINE_WIDTH);
 };
 
-// A spike: a dark green zombie hazard triangle.
+// Zombie-like hazard tiles: more obvious and menacing.
 Draw.spike = function (x, y, size) {
   var ctx = Draw.ctx;
-  ctx.fillStyle = "#2d6b3a";
+  ctx.fillStyle = "#5a9c3e";
+  ctx.fillRect(x, y + size * 0.35, size, size * 0.65);
+
+  ctx.fillStyle = "#2f6e39";
   ctx.beginPath();
   ctx.moveTo(x, y + size);
-  ctx.lineTo(x + size / 2, y);
+  ctx.lineTo(x + size / 2, y + 2);
   ctx.lineTo(x + size, y + size);
   ctx.closePath();
   ctx.fill();
+
+  ctx.fillStyle = "#d0f3a3";
+  ctx.fillRect(x + 2, y + size * 0.55, size - 4, 4);
 };
 
-// The finish: a flag pole with a little garden-defense vibe.
 Draw.finish = function (x, y, size) {
   var ctx = Draw.ctx;
-  ctx.fillStyle = "#2c5d2b";
-  ctx.fillRect(x + size / 2 - 2, y, 4, size);
+  ctx.fillStyle = "#234d2d";
+  ctx.fillRect(x + size / 2 - 3, y, 6, size);
 
-  ctx.fillStyle = "#ffcf4a";
+  ctx.fillStyle = "#ffce44";
   ctx.beginPath();
-  ctx.arc(x + size * 0.72, y + 10, 8, 0, Math.PI * 2);
+  ctx.moveTo(x + size / 2 + 3, y + 4);
+  ctx.lineTo(x + size - 5, y + 14);
+  ctx.lineTo(x + size / 2 + 3, y + 24);
+  ctx.closePath();
   ctx.fill();
 
-  ctx.fillStyle = "#5dbf4a";
+  ctx.fillStyle = "#69d158";
   ctx.beginPath();
-  ctx.moveTo(x + size / 2 + 2, y + 4);
-  ctx.lineTo(x + size - 4, y + 12);
-  ctx.lineTo(x + size / 2 + 2, y + 20);
+  ctx.moveTo(x + size / 2 + 3, y + 4);
+  ctx.lineTo(x + size - 7, y + 14);
+  ctx.lineTo(x + size / 2 + 3, y + 24);
   ctx.closePath();
   ctx.fill();
 };
 
-// The player: a cartoon Crazy Dave-style hero with a blaster.
 Draw.player = function () {
   var ctx = Draw.ctx;
   var r = CONFIG.PLAYER_RADIUS;
@@ -129,46 +134,46 @@ Draw.player = function () {
   // shadow
   ctx.fillStyle = "rgba(30, 56, 26, 0.18)";
   ctx.beginPath();
-  ctx.ellipse(centerX, centerY + 18, 18, 8, 0, 0, Math.PI * 2);
+  ctx.ellipse(centerX, centerY + 20, 18, 8, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // head
+  ctx.fillStyle = "#f8d7a0";
+  ctx.beginPath();
+  ctx.arc(centerX, centerY - 6, r * 0.78, 0, Math.PI * 2);
   ctx.fill();
 
   // body / shirt
-  ctx.fillStyle = "#7ecb58";
-  ctx.strokeStyle = "#2f5f2c";
-  ctx.lineWidth = CONFIG.LINE_WIDTH;
+  ctx.fillStyle = "#8edb5a";
+  ctx.strokeStyle = "#234d2d";
+  ctx.lineWidth = CONFIG.LINE_WIDTH + 1;
   ctx.beginPath();
-  ctx.arc(centerX, centerY, r, 0, Math.PI * 2);
+  ctx.arc(centerX, centerY + 6, r, 0, Math.PI * 2);
   ctx.fill();
   ctx.stroke();
 
-  // face
-  ctx.fillStyle = "#f5d6a8";
+  // Crazy Dave hair
+  ctx.fillStyle = "#f5b538";
   ctx.beginPath();
-  ctx.arc(centerX, centerY - 5, r * 0.7, 0, Math.PI * 2);
-  ctx.fill();
-
-  // crazy hair
-  ctx.fillStyle = "#f5b433";
-  ctx.beginPath();
-  ctx.moveTo(centerX - 12, centerY - 20);
-  ctx.lineTo(centerX - 2, centerY - 30);
-  ctx.lineTo(centerX + 8, centerY - 18);
-  ctx.lineTo(centerX + 16, centerY - 29);
-  ctx.lineTo(centerX + 20, centerY - 14);
-  ctx.lineTo(centerX - 12, centerY - 14);
+  ctx.moveTo(centerX - 18, centerY - 18);
+  ctx.lineTo(centerX - 6, centerY - 34);
+  ctx.lineTo(centerX + 4, centerY - 16);
+  ctx.lineTo(centerX + 16, centerY - 32);
+  ctx.lineTo(centerX + 22, centerY - 17);
+  ctx.lineTo(centerX - 18, centerY - 17);
   ctx.closePath();
   ctx.fill();
 
   // glasses
-  ctx.strokeStyle = "#1f1f1f";
+  ctx.strokeStyle = "#1b1b1b";
   ctx.lineWidth = 3;
   ctx.beginPath();
-  ctx.rect(centerX - 15, centerY - 12, 10, 7);
-  ctx.rect(centerX + 5, centerY - 12, 10, 7);
+  ctx.rect(centerX - 18, centerY - 12, 12, 8);
+  ctx.rect(centerX + 6, centerY - 12, 12, 8);
   ctx.stroke();
   ctx.beginPath();
-  ctx.moveTo(centerX - 5, centerY - 8);
-  ctx.lineTo(centerX + 5, centerY - 8);
+  ctx.moveTo(centerX - 6, centerY - 8);
+  ctx.lineTo(centerX + 6, centerY - 8);
   ctx.stroke();
 
   // smile
@@ -176,9 +181,9 @@ Draw.player = function () {
   ctx.arc(centerX, centerY + 2, 8, 0.2, Math.PI - 0.2);
   ctx.stroke();
 
-  // blaster in hand
-  var aimX = centerX + Math.cos(Player.angle) * 22;
-  var aimY = centerY + Math.sin(Player.angle) * 22;
+  // weapon / blaster silhouette
+  var aimX = centerX + Math.cos(Player.angle) * 26;
+  var aimY = centerY + Math.sin(Player.angle) * 26;
   ctx.strokeStyle = "#2d2d2d";
   ctx.lineWidth = 5;
   ctx.beginPath();
@@ -186,14 +191,12 @@ Draw.player = function () {
   ctx.lineTo(aimX, aimY);
   ctx.stroke();
 
-  ctx.fillStyle = "#4a4a4a";
-  ctx.fillRect(aimX - 8, aimY - 3, 18, 6);
+  ctx.fillStyle = "#474747";
+  ctx.fillRect(aimX - 12, aimY - 4, 20, 8);
   ctx.fillStyle = "#d8d8d8";
-  ctx.fillRect(aimX + 10, aimY - 1, 8, 2);
+  ctx.fillRect(aimX + 8, aimY - 2, 10, 4);
 
-  // little goofy visor / face accent
-  ctx.fillStyle = "#2b6a3a";
-  ctx.fillRect(centerX - 8, centerY + 10, 16, 10);
+  // chest stripe / plant badge
+  ctx.fillStyle = "#2a6f3b";
+  ctx.fillRect(centerX - 14, centerY + 1, 28, 7);
 };
-
-

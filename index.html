@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -7,13 +7,34 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>PEASHOOTER RUSH</h1>
-  <p id="status" class="status">Initializing...</p>
-  <canvas id="game" width="800" height="400"></canvas>
-  <p id="score">Loading...</p>
-  <p id="message">Loading...</p>
-  <p class="controls">A/D or arrow keys move • Space jump • Click or X shoot • T reload • R restart</p>
+  <div class="page-shell">
+    <header class="game-header">
+      <div class="header-flag left"></div>
+      <h1>PEASHOOTER RUSH</h1>
+      <div class="header-flag right"></div>
+    </header>
 
+    <div class="hud-panel">
+      <div id="status" class="status">Initializing...</div>
+      <div id="score" class="score">Score: 0</div>
+    </div>
+
+    <canvas id="game" width="800" height="400"></canvas>
+
+    <p id="message">Loading...</p>
+    <p class="controls">
+      A/D or arrows move &nbsp;&middot;&nbsp;
+      Space jump &nbsp;&middot;&nbsp;
+      Click or X shoot &nbsp;&middot;&nbsp;
+      T reload &nbsp;&middot;&nbsp;
+      R restart
+    </p>
+  </div>
+
+  <!-- ===================================================================
+       THE ORDER OF THESE FILES MATTERS. Each one uses the ones above it.
+       If you add a new file, add it to this list too, in the right spot.
+       =================================================================== -->
   <script src="js/config.js"></script>
   <script src="js/input.js"></script>
   <script src="js/level.js"></script>
