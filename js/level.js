@@ -1,61 +1,9 @@
-var Level = {
-  pieces: null, levels: null, grid: [], cols: 0, name: "", startX: 0, startY: 0,
-  totalCoins: 0
-};
-
-Level.loadData = function (whenDone) {
-  fetch("data/pieces.json").then(function (r) { return r.json(); })
-    .then(function (piecesFile) { Level.pieces = piecesFile; return fetch("data/levels.json"); })
-    .then(function (r) { return r.json(); })
-    .then(function (levelsFile) { Level.levels = levelsFile.levels; whenDone(); })
-    .catch(function (error) {
-      document.getElementById("message").textContent = "Could not load the level files.";
-      console.error(error);
-    });
-};
-
-Level.build = function (levelNumber) {
-  var level = Level.levels[levelNumber];
-  Level.name = level.name;
-  Level.grid = [];
-  Level.cols = level.pieces.length * CONFIG.PIECE_COLS;
-  for (var row = 0; row < CONFIG.ROWS; row++) { Level.grid.push(""); }
-  for (var p = 0; p < level.pieces.length; p++) {
-    var piece = Level.pieces[level.pieces[p]] || Level.pieces.flat;
-    for (var r = 0; r < CONFIG.ROWS; r++) { Level.grid[r] += piece[r]; }
-  }
-  Level.findStart();
-  Level.countCoins();
-};
-
-Level.findStart = function () {
-  for (var row = 0; row < CONFIG.ROWS; row++) {
-    for (var col = 0; col < Level.cols; col++) {
-      if (Level.charAt(col, row) === "S") { Level.startX = col * CONFIG.TILE; Level.startY = row * CONFIG.TILE; return; }
-    }
-  }
-  Level.startX = 0; Level.startY = 0;
-};
-
-Level.countCoins = function () {
-  Level.totalCoins = 0;
-  for (var row = 0; row < CONFIG.ROWS; row++) {
-    for (var col = 0; col < Level.cols; col++) {
-      if (Level.charAt(col, row) === "C") { Level.totalCoins += 1; }
-    }
-  }
-};
-
-Level.removeCoin = function (col, row) {
-  var line = Level.grid[row];
-  Level.grid[row] = line.slice(0, col) + "." + line.slice(col + 1);
-};
-Level.charAt = function (col, row) {
-  if (row < 0 || row >= CONFIG.ROWS || col < 0 || col >= Level.cols) { return "."; }
-  return Level.grid[row].charAt(col);
-};
-Level.isSolid = function (col, row) { return Level.charAt(col, row) === "#"; };
-Level.isSpike = function (col, row) { return Level.charAt(col, row) === "^"; };
-Level.isCoin = function (col, row) { return Level.charAt(col, row) === "C"; };
-Level.isFinish = function (col, row) { return Level.charAt(col, row) === "F"; };
-Level.pixelWidth = function () { return Level.cols * CONFIG.TILE; };
+var Level={pieces:null,levels:null,grid:[],cols:0,name:"",startX:0,startY:0,totalCoins:0};
+Level.setStatus=function(t){var e=document.getElementById("status");if(e)e.textContent=t;};
+Level.loadData=function(done){Level.setStatus("Loading pieces...");fetch("data/pieces.json").then(function(r){if(!r.ok)throw Error("pieces.json HTTP "+r.status);return r.json();}).then(function(p){Level.pieces=p;Level.setStatus("Loading levels...");return fetch("data/levels.json");}).then(function(r){if(!r.ok)throw Error("levels.json HTTP "+r.status);return r.json();}).then(function(f){if(!f.levels||!f.levels.length)throw Error("levels.json has no levels");Level.levels=f.levels;done();}).catch(function(e){Level.setStatus("Game failed: data could not load");var m=document.getElementById("message");if(m)m.textContent="Check that you opened the game through HTTP (not file://).";console.error(e);});};
+Level.build=function(n){var l=Level.levels[n];if(!l)throw Error("Missing level "+n);Level.name=l.name;Level.grid=[];Level.cols=l.pieces.length*CONFIG.PIECE_COLS;for(var r=0;r<CONFIG.ROWS;r++)Level.grid[r]="";for(var p=0;p<l.pieces.length;p++){var piece=Level.pieces[l.pieces[p]]||Level.pieces.flat;if(!piece||piece.length!==CONFIG.ROWS)throw Error("Invalid piece: "+l.pieces[p]);for(var r2=0;r2<CONFIG.ROWS;r2++)Level.grid[r2]+=piece[r2];}Level.findStart();Level.countCoins();};
+Level.findStart=function(){for(var r=0;r<CONFIG.ROWS;r++)for(var c=0;c<Level.cols;c++)if(Level.charAt(c,r)==="S"){Level.startX=c*CONFIG.TILE;Level.startY=r*CONFIG.TILE;return;}Level.startX=0;Level.startY=0;};
+Level.countCoins=function(){Level.totalCoins=0;for(var r=0;r<CONFIG.ROWS;r++)for(var c=0;c<Level.cols;c++)if(Level.charAt(c,r)==="C")Level.totalCoins++;};
+Level.removeCoin=function(c,r){var s=Level.grid[r];Level.grid[r]=s.slice(0,c)+"."+s.slice(c+1);};
+Level.charAt=function(c,r){return r<0||r>=CONFIG.ROWS||c<0||c>=Level.cols?".":Level.grid[r].charAt(c);};
+Level.isSolid=function(c,r){return Level.charAt(c,r)==="#";};Level.isSpike=function(c,r){return Level.charAt(c,r)==="^";};Level.isCoin=function(c,r){return Level.charAt(c,r)==="C";};Level.isFinish=function(c,r){return Level.charAt(c,r)==="F";};Level.pixelWidth=function(){return Level.cols*CONFIG.TILE;};

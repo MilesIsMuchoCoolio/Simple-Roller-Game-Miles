@@ -1,34 +1,4 @@
-/* Keyboard and mouse controls. */
-var Input = {
-  left: false, right: false, jump: false, restart: false,
-  shoot: false, reload: false, mouseX: 400, mouseY: 200
-};
-
-window.addEventListener("keydown", function (event) {
-  setKey(event.key, true);
-  if (["ArrowLeft", "ArrowRight", "ArrowUp", " "].indexOf(event.key) >= 0) event.preventDefault();
-});
-window.addEventListener("keyup", function (event) { setKey(event.key, false); });
-
-function setKey(key, isDown) {
-  if (key === "ArrowLeft" || key === "a" || key === "A") Input.left = isDown;
-  if (key === "ArrowRight" || key === "d" || key === "D") Input.right = isDown;
-  if (key === "ArrowUp" || key === " " || key === "w" || key === "W") Input.jump = isDown;
-  if (key === "r" || key === "R") Input.restart = isDown;
-  if (key === "x" || key === "X" || key === "Control") Input.shoot = isDown;
-  if (key === "t" || key === "T") Input.reload = isDown;
-}
-
-window.addEventListener("mousemove", function (event) {
-  var canvas = document.getElementById("game");
-  if (!canvas) return;
-  var rect = canvas.getBoundingClientRect();
-  Input.mouseX = (event.clientX - rect.left) * canvas.width / rect.width;
-  Input.mouseY = (event.clientY - rect.top) * canvas.height / rect.height;
-});
-window.addEventListener("mousedown", function (event) {
-  if (event.button === 0) Input.shoot = true;
-});
-window.addEventListener("mouseup", function (event) {
-  if (event.button === 0) Input.shoot = false;
-});
+var Input={left:false,right:false,jump:false,restart:false,shoot:false,reload:false,mouseX:400,mouseY:200};
+window.addEventListener("keydown",function(e){setKey(e.key,true);if(["ArrowLeft","ArrowRight","ArrowUp"," "].indexOf(e.key)>=0)e.preventDefault();});window.addEventListener("keyup",function(e){setKey(e.key,false);});
+function setKey(k,d){if(k==="ArrowLeft"||k==="a"||k==="A")Input.left=d;if(k==="ArrowRight"||k==="d"||k==="D")Input.right=d;if(k==="ArrowUp"||k===" "||k==="w"||k==="W")Input.jump=d;if(k==="r"||k==="R")Input.restart=d;if(k==="x"||k==="X"||k==="Control")Input.shoot=d;if(k==="t"||k==="T")Input.reload=d;}
+window.addEventListener("mousemove",function(e){var c=document.getElementById("game"),b=c.getBoundingClientRect();Input.mouseX=(e.clientX-b.left)*c.width/b.width;Input.mouseY=(e.clientY-b.top)*c.height/b.height;});window.addEventListener("mousedown",function(e){if(e.button===0)Input.shoot=true;});window.addEventListener("mouseup",function(e){if(e.button===0)Input.shoot=false;});

@@ -1,21 +1,5 @@
-/* =====================================================================
-   main.js  --  THE STARTING LINE.
-   ===================================================================== */
-
-Draw.setup();
-Level.setStatus("Initializing canvas...");
-
-window.addEventListener("error", function (event) {
-  var messageEl = document.getElementById("message");
-  var statusEl = document.getElementById("status");
-  if (messageEl) { messageEl.textContent = "Script error: " + event.message; }
-  if (statusEl) { statusEl.textContent = "Game failed to start."; }
-  console.error("Runtime error:", event.error || event.message);
-});
-
-Level.loadData(function () {
-  Level.setStatus("Building level...");
-  Game.startLevel(CONFIG.START_LEVEL);
-  Level.setStatus("Game running.");
-  Game.loop();
-});
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ROLLER</title><link rel="stylesheet" href="style.css"></head>
+<body><h1>ROLLER</h1><p id="status" class="status">Initializing...</p><canvas id="game" width="800" height="400"></canvas><p id="score">Loading...</p><p id="message">Loading...</p><p class="controls">A/D or arrows move · W/SPACE jump · click or X shoot toward cursor · T reload · R restart</p>
+<script src="js/config.js"></script><script src="js/input.js"></script><script src="js/level.js"></script><script src="js/collide.js"></script><script src="js/player.js"></script><script src="js/combat.js"></script><script src="js/draw.js"></script><script src="js/crumble.js"></script><script src="js/game.js"></script><script src="js/main.js"></script></body></html>
