@@ -1,136 +1,63 @@
 /* =====================================================================
-   draw.js  --  EVERYTHING YOU CAN SEE.
+   collide.js  --  DID THE PLAYER TOUCH SOMETHING?
 
-   Nothing in this file changes the game. It only puts pixels on screen.
-   If you want to change how the game LOOKS, this is the only file you
-   need. If you want to change how it BEHAVES, this is the wrong file.
+   The player is a BOX for collision, even though it is drawn as a
+   circle. Boxes are much easier to check, and nobody can tell.
 
-   The whole game is black and white on purpose. That is your room to
-   work in.
+   Every function here answers one yes-or-no question about a box.
    ===================================================================== */
 
-var Draw = {
-  canvas: null,
-  ctx: null,
-  cameraX: 0     // how far the view has scrolled to the right
-};
+var Collide = {};
 
-Draw.setup = function () {
-  Draw.canvas = document.getElementById("game");
-  Draw.ctx = Draw.canvas.getContext("2d");
-};
+// Which grid squares does this box overlap?
+// Returns a list of { col: , row: } objects.
+Collide.squaresUnder = function (x, y, width, height) {
+  var firstCol = Math.floor(x / CONFIG.TILE);
+  var lastCol  = Math.floor((x + width  - 1) / CONFIG.TILE);
+  var firstRow = Math.floor(y / CONFIG.TILE);
+  var lastRow  = Math.floor((y + height - 1) / CONFIG.TILE);
 
-// Follow the player, but never scroll past the ends of the level.
-Draw.updateCamera = function () {
-  Draw.cameraX = Player.x - CONFIG.CANVAS_W / 2;
-  if (Draw.cameraX < 0) { Draw.cameraX = 0; }
-
-  var furthest = Level.pixelWidth() - CONFIG.CANVAS_W;
-  if (furthest < 0) { furthest = 0; }   // level narrower than the screen
-  if (Draw.cameraX > furthest) { Draw.cameraX = furthest; }
-};
-
-// Draw one whole frame.
-Draw.everything = function () {
-  var ctx = Draw.ctx;
-
-  // 1. wipe the screen white
-  ctx.fillStyle = "#ffffff";
-  ctx.fillRect(0, 0, CONFIG.CANVAS_W, CONFIG.CANVAS_H);
-
-  // 2. shift everything left so the camera looks like it moved right
-  ctx.save();
-  ctx.translate(-Draw.cameraX, 0);
-  Draw.world();
-  Crumble.draw();
-  Draw.player();
-
-  ctx.restore();
-};
-
-// Draw every grid square that is currently on screen.
-Draw.world = function () {
-  var ctx = Draw.ctx;
-  var size = CONFIG.TILE;
-
-  // only look at the columns that are actually visible. much faster.
-  var firstCol = Math.floor(Draw.cameraX / size) - 1;
-  var lastCol  = firstCol + Math.ceil(CONFIG.CANVAS_W / size) + 2;
-
-  for (var row = 0; row < CONFIG.ROWS; row++) {
+  var squares = [];
+  for (var row = firstRow; row <= lastRow; row++) {
     for (var col = firstCol; col <= lastCol; col++) {
-      var here = Level.charAt(col, row);
-      var x = col * size;
-      var y = row * size;
-
-      if (here === "#") { Draw.block(x, y, size); }
-      if (here === "^") { Draw.spike(x, y, size); }
-      if (here === "F") { Draw.finish(x, y, size); }
+      squares.push({ col: col, row: row });
     }
   }
+  return squares;
 };
 
-// A solid block: white inside, black outline.
-Draw.block = function (x, y, size) {
-  var ctx = Draw.ctx;
-  ctx.fillStyle = "#ffffff";
-  ctx.fillRect(x, y, size, size);
-  ctx.strokeStyle = "#000000";
-  ctx.lineWidth = CONFIG.LINE_WIDTH;
-  ctx.strokeRect(x + CONFIG.LINE_WIDTH / 2,
-                 y + CONFIG.LINE_WIDTH / 2,
-                 size - CONFIG.LINE_WIDTH,
-                 size - CONFIG.LINE_WIDTH);
+// Is this box inside a solid block?
+Collide.hitsSolid = function (x, y, width, height) {
+  var squares = Collide.squaresUnder(x, y, width, height);
+  for (var i = 0; i < squares.length; i++) {
+    if (Level.isSolid(squares[i].col, squares[i].row)) { return true; }
+  }
+  return false;
 };
 
-// A spike: a solid black triangle pointing up.
-Draw.spike = function (x, y, size) {
-  var ctx = Draw.ctx;
-  ctx.fillStyle = "#000000";
-  ctx.beginPath();
-  ctx.moveTo(x, y + size);
-  ctx.lineTo(x + size / 2, y);
-  ctx.lineTo(x + size, y + size);
-  ctx.closePath();
-  ctx.fill();
+// Is this box touching a spike?
+Collide.hitsSpike = function (x, y, width, height) {
+  var squares = Collide.squaresUnder(x, y, width, height);
+  for (var i = 0; i < squares.length; i++) {
+    if (Level.isSpike(squares[i].col, squares[i].row)) { return true; }
+  }
+  return false;
 };
 
-// The finish: a black pole with a flag on it.
-Draw.finish = function (x, y, size) {
-  var ctx = Draw.ctx;
-  ctx.fillStyle = "#000000";
-  ctx.fillRect(x + size / 2 - 2, y, 4, size);
-  ctx.beginPath();
-  ctx.moveTo(x + size / 2 + 2, y + 4);
-  ctx.lineTo(x + size - 4,     y + 12);
-  ctx.lineTo(x + size / 2 + 2, y + 20);
-  ctx.closePath();
-  ctx.fill();
+// Is this box touching a coin?
+Collide.hitsCoin = function (x, y, width, height) {
+  var squares = Collide.squaresUnder(x, y, width, height);
+  for (var i = 0; i < squares.length; i++) {
+    if (Level.isCoin(squares[i].col, squares[i].row)) { return true; }
+  }
+  return false;
 };
 
-// The player: a white circle with a black outline and one off-center
-// black dot, so you can see it roll.
-Draw.player = function () {
-  var ctx = Draw.ctx;
-  var r = CONFIG.PLAYER_RADIUS;
-  var centerX = Player.x + CONFIG.PLAYER_SIZE / 2;
-  var centerY = Player.y + CONFIG.PLAYER_SIZE / 2;
-
-  // the circle
-  ctx.fillStyle = "#ffffff";
-  ctx.strokeStyle = "#000000";
-  ctx.lineWidth = CONFIG.LINE_WIDTH;
-  ctx.beginPath();
-  ctx.arc(centerX, centerY, r, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.stroke();
-
-  // the off-center dot. its position depends on how far we have rolled.
-  var dotX = centerX + Math.cos(Player.angle) * r * CONFIG.DOT_DISTANCE;
-  var dotY = centerY + Math.sin(Player.angle) * r * CONFIG.DOT_DISTANCE;
-
-  ctx.fillStyle = "#000000";
-  ctx.beginPath();
-  ctx.arc(dotX, dotY, 4, 0, Math.PI * 2);
-  ctx.fill();
+// Is this box touching the finish?
+Collide.hitsFinish = function (x, y, width, height) {
+  var squares = Collide.squaresUnder(x, y, width, height);
+  for (var i = 0; i < squares.length; i++) {
+    if (Level.isFinish(squares[i].col, squares[i].row)) { return true; }
+  }
+  return false;
 };

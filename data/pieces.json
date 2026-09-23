@@ -1,212 +1,108 @@
-{
-  "_comment": "Every piece is 8 columns wide and 10 rows tall. Draw it like a picture. '.' is empty air, '#' is a solid block, '^' is a spike, 'S' is where the player starts, 'F' is the finish. To invent a new piece, copy one of these, rename it, and change the picture. Then use its name in data/levels.json.",
+/* =====================================================================
+   player.js  --  THE ROLLING CIRCLE.
 
-  "start": [
-    "........",
-    "........",
-    "........",
-    "........",
-    "........",
-    "........",
-    "........",
-    "..S.....",
-    "########",
-    "########"
-  ],
+   This file owns everything about the player: where it is, how fast it
+   is going, and what happens when it hits something.
 
-  "flat": [
-    "........",
-    "........",
-    "........",
-    "........",
-    "........",
-    "........",
-    "........",
-    "........",
-    "########",
-    "########"
-  ],
+   It does NOT draw anything. Drawing lives in js/draw.js.
+   ===================================================================== */
 
-  "gap": [
-    "........",
-    "........",
-    "........",
-    "........",
-    "........",
-    "........",
-    "........",
-    "........",
-    "###..###",
-    "###..###"
-  ],
+var Player = {
+  x: 0,            // position in pixels, left edge of the box
+  y: 0,            // position in pixels, top edge of the box
+  vx: 0,           // speed left and right
+  vy: 0,           // speed up and down
+  onGround: false, // is the player standing on something right now?
+  angle: 0         // how far the circle has rolled, for drawing the dot
+};
 
-  "spikes": [
-    "........",
-    "........",
-    "........",
-    "........",
-    "........",
-    "........",
-    "........",
-    "...^^...",
-    "########",
-    "########"
-  ],
+// Put the player back at the level's S square.
+Player.reset = function () {
+  Player.x = Level.startX;
+  Player.y = Level.startY;
+  Player.vx = 0;
+  Player.vy = 0;
+  Player.onGround = false;
+  Player.angle = 0;
+};
 
-  "step": [
-    "........",
-    "........",
-    "........",
-    "........",
-    "........",
-    "........",
-    ".....###",
-    ".....###",
-    "########",
-    "########"
-  ],
+// Run one frame of player movement.
+Player.update = function () {
+  var size = CONFIG.PLAYER_SIZE;
 
-  "platform": [
-    "........",
-    "........",
-    "........",
-    "........",
-    "........",
-    "........",
-    "..####..",
-    "........",
-    "########",
-    "########"
-  ],
+  // --- 1. decide how fast to go sideways ------------------------------
+  Player.vx = 0;
+  if (Input.left)  { Player.vx = -CONFIG.MOVE_SPEED; }
+  if (Input.right) { Player.vx =  CONFIG.MOVE_SPEED; }
 
-  "stairs": [
-    "........",
-    "........",
-    "........",
-    "........",
-    "........",
-    "......##",
-    "....####",
-    "..######",
-    "########",
-    "########"
-  ],
+  // --- 2. jump, but only if we are standing on something --------------
+  if (Input.jump && Player.onGround) {
+    Player.vy = -CONFIG.JUMP_POWER;   // negative is UP
+    Player.onGround = false;
+  }
 
-  "spikepit": [
-    "........",
-    "........",
-    "........",
-    "........",
-    "........",
-    "........",
-    "..####..",
-    "..^^^^..",
-    "########",
-    "########"
-  ],
+  // --- 3. gravity pulls down every single frame -----------------------
+  Player.vy = Player.vy + CONFIG.GRAVITY;
+  if (Player.vy > CONFIG.MAX_FALL) { Player.vy = CONFIG.MAX_FALL; }
 
-  "finish": [
-    "........",
-    "........",
-    "........",
-    "........",
-    "........",
-    "........",
-    "....F...",
-    "....F...",
-    "########",
-    "########"
-  ],
-  
-"crumble": [  
-  "........",  
-  "........",  
-  "........",  
-  "........",  
-  "........",  
-  "........",  
-  "..cccc..",  
-  "........",  
-  "###..###",  
-  "###..###"  
-],
+  // --- 4. move sideways, one pixel at a time, stopping at walls -------
+  var stepX = 0;
+  if (Player.vx > 0) { stepX = 1; }
+  if (Player.vx < 0) { stepX = -1; }
 
-"crumble_bridge": [
-  "........",
-  "........",
-  "........",
-  "........",
-  "........",
-  "........",
-  ".cccccc.",
-  "........",
-  "##....##",
-  "##....##"
-],
+  for (var i = 0; i < Math.abs(Player.vx); i++) {
+    if (Collide.hitsSolid(Player.x + stepX, Player.y, size, size)) { break; }
+    Player.x = Player.x + stepX;
+    Player.angle = Player.angle + stepX / CONFIG.PLAYER_RADIUS; // roll it
+  }
 
-"spikes_wide": [
-  "........",
-  "........",
-  "........",
-  "........",
-  "........",
-  "........",
-  "........",
-  "..^^^^..",
-  "########",
-  "########"
-],
+  // --- 5. move up or down, one pixel at a time ------------------------
+  var stepY = 0;
+  if (Player.vy > 0) { stepY = 1; }
+  if (Player.vy < 0) { stepY = -1; }
 
-"wallstep": [
-  "........",
-  "........",
-  "........",
-  "........",
-  "....##..",
-  "....##..",
-  "....##..",
-  "....##..",
-  "########",
-  "########"
-],
+  Player.onGround = false;
 
-"gap_wide": [
-  "........",
-  "........",
-  "........",
-  "........",
-  "........",
-  "........",
-  "........",
-  "........",
-  "##....##",
-  "##....##"
-],
+  for (var j = 0; j < Math.abs(Player.vy); j++) {
+    if (Collide.hitsSolid(Player.x, Player.y + stepY, size, size)) {
+      if (stepY > 0) { Player.onGround = true; }  // we landed on something
+      Player.vy = 0;
+      break;
+    }
+    Player.y = Player.y + stepY;
+  }
 
-"spike_gap": [
-  "........",
-  "........",
-  "........",
-  "........",
-  "........",
-  "........",
-  "........",
-  "..^^....",
-  "##....##",
-  "##....##"
-],
+  // --- 6. keep the player inside the left edge of the world -----------
+  if (Player.x < 0) { Player.x = 0; }
+};
 
-"double_step": [
-  "........",
-  "........",
-  "........",
-  "....##..",
-  "....##..",
-  "..####..",
-  "..####..",
-  "########",
-  "########",
-  "########"
-]  
+Player.collectCoins = function () {
+  var size = CONFIG.PLAYER_SIZE;
+  var squares = Collide.squaresUnder(Player.x, Player.y, size, size);
 
-}
+  for (var i = 0; i < squares.length; i++) {
+    var col = squares[i].col;
+    var row = squares[i].row;
+
+    if (Level.isCoin(col, row)) {
+      Level.removeCoin(col, row);
+      Game.score += 1;
+      Game.updateHUD();
+      return;
+    }
+  }
+};
+
+// Did the player just touch something deadly?
+Player.isDead = function () {
+  var size = CONFIG.PLAYER_SIZE;
+  if (Collide.hitsSpike(Player.x, Player.y, size, size)) { return true; }
+  if (Player.y > CONFIG.CANVAS_H + 200) { return true; }   // fell off the world
+  return false;
+};
+
+// Did the player just reach the finish?
+Player.hasWon = function () {
+  var size = CONFIG.PLAYER_SIZE;
+  return Collide.hitsFinish(Player.x, Player.y, size, size);
+};

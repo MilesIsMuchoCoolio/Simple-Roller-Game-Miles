@@ -1,38 +1,69 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ROLLER</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+{
+  "_comment": "A level is just a list of piece names in order, left to right. Every name you use here must exist in data/pieces.json. Add, remove, or reorder pieces to build a new level. Every level should still end with a finish piece.",
 
-  <h1>ROLLER</h1>
-
-  <canvas id="game" width="800" height="400"></canvas>
-
-  <p id="message">Loading...</p>
-
-  <p class="controls">
-    LEFT / RIGHT arrow to roll &nbsp;&middot;&nbsp;
-    SPACE or UP arrow to jump &nbsp;&middot;&nbsp;
-    R to restart
-  </p>
-
-  <!-- ===================================================================
-       THE ORDER OF THESE FILES MATTERS. Each one uses the ones above it.
-       If you add a new file, add it to this list too, in the right spot.
-       =================================================================== -->
-  <script src="js/config.js"></script>
-  <script src="js/input.js"></script>
-  <script src="js/level.js"></script>
-  <script src="js/collide.js"></script>
-  <script src="js/player.js"></script>
-  <script src="js/draw.js"></script>
-  <script src="js/crumble.js"></script>  
-  <script src="js/game.js"></script>
-  <script src="js/main.js"></script>
-
-</body>
-</html>
+  "levels": [
+    {
+      "name": "Level 1 - Warm Up",
+      "pieces": [
+        "start",
+        "coin",
+        "crumble",
+        "coin",
+        "crumble_bridge",
+        "flat",
+        "gap",
+        "coin",
+        "spikes",
+        "spike_gap",
+        "platform",
+        "coin",
+        "stairs",
+        "finish"
+      ]
+    },
+    {
+      "name": "Level 2 - Watch Your Step",
+      "pieces": [
+        "start",
+        "coin",
+        "spikes",
+        "coin",
+        "spikes_wide",
+        "gap",
+        "coin",
+        "gap_wide",
+        "step",
+        "double_step",
+        "coin",
+        "spikepit",
+        "crumble_bridge",
+        "platform",
+        "gap",
+        "flat",
+        "finish"
+      ]
+    },
+    {
+      "name": "Level 3 - Crumble Run",
+      "pieces": [
+        "start",
+        "coin",
+        "crumble_bridge",
+        "spikes_wide",
+        "gap",
+        "coin",
+        "spike_gap",
+        "crumble",
+        "wallstep",
+        "coin",
+        "double_step",
+        "spikepit",
+        "gap_wide",
+        "stairs",
+        "coin",
+        "crumble_bridge",
+        "finish"
+      ]
+    }
+  ]
+}

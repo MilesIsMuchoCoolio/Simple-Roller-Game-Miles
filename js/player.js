@@ -1,91 +1,73 @@
 /* =====================================================================
-   player.js  --  THE ROLLING CIRCLE.
+   game.js  --  THE RULES AND THE LOOP.
 
-   This file owns everything about the player: where it is, how fast it
-   is going, and what happens when it hits something.
+   The game is always in exactly ONE mode: "playing", "dead", or "won".
+   Which mode it is in decides what happens each frame.
 
-   It does NOT draw anything. Drawing lives in js/draw.js.
+   The loop runs about 60 times a second, forever. Every time it runs it
+   does the same two things: UPDATE (change the numbers) and DRAW (show
+   the numbers).
    ===================================================================== */
 
-var Player = {
-  x: 0,            // position in pixels, left edge of the box
-  y: 0,            // position in pixels, top edge of the box
-  vx: 0,           // speed left and right
-  vy: 0,           // speed up and down
-  onGround: false, // is the player standing on something right now?
-  angle: 0         // how far the circle has rolled, for drawing the dot
+var Game = {
+  mode: "playing",   // "playing", "dead", or "won"
+  levelNumber: 0,
+  score: 0
 };
 
-// Put the player back at the level's S square.
-Player.reset = function () {
-  Player.x = Level.startX;
-  Player.y = Level.startY;
-  Player.vx = 0;
-  Player.vy = 0;
-  Player.onGround = false;
-  Player.angle = 0;
+Game.startLevel = function (levelNumber) {
+  Game.levelNumber = levelNumber;
+  Level.build(levelNumber);
+  Crumble.reset();
+  Player.reset();
+  Game.score = 0;
+  Game.mode = "playing";
+  Game.showMessage("");
+  Game.updateHUD();
 };
 
-// Run one frame of player movement.
-Player.update = function () {
-  var size = CONFIG.PLAYER_SIZE;
+Game.showMessage = function (text) {
+  document.getElementById("message").textContent = text;
+};
 
-  // --- 1. decide how fast to go sideways ------------------------------
-  Player.vx = 0;
-  if (Input.left)  { Player.vx = -CONFIG.MOVE_SPEED; }
-  if (Input.right) { Player.vx =  CONFIG.MOVE_SPEED; }
+Game.updateHUD = function () {
+  var scoreLabel = document.getElementById("score");
+  if (!scoreLabel) { return; }
+  scoreLabel.textContent = "Coins: " + Game.score + " / " + Level.totalCoins;
+};
 
-  // --- 2. jump, but only if we are standing on something --------------
-  if (Input.jump && Player.onGround) {
-    Player.vy = -CONFIG.JUMP_POWER;   // negative is UP
-    Player.onGround = false;
+// --- ONE FRAME --------------------------------------------------------
+Game.update = function () {
+
+  // R always restarts, no matter what mode we are in.
+  if (Input.restart) {
+    Game.startLevel(Game.levelNumber);
+    return;
   }
 
-  // --- 3. gravity pulls down every single frame -----------------------
-  Player.vy = Player.vy + CONFIG.GRAVITY;
-  if (Player.vy > CONFIG.MAX_FALL) { Player.vy = CONFIG.MAX_FALL; }
+  // If we are not playing, nothing moves. We just wait for R.
+  if (Game.mode !== "playing") { return; }
+  Player.update();
+  Player.collectCoins();
+  Crumble.update();
 
-  // --- 4. move sideways, one pixel at a time, stopping at walls -------
-  var stepX = 0;
-  if (Player.vx > 0) { stepX = 1; }
-  if (Player.vx < 0) { stepX = -1; }
-
-  for (var i = 0; i < Math.abs(Player.vx); i++) {
-    if (Collide.hitsSolid(Player.x + stepX, Player.y, size, size)) { break; }
-    Player.x = Player.x + stepX;
-    Player.angle = Player.angle + stepX / CONFIG.PLAYER_RADIUS; // roll it
+  if (Player.isDead()) {
+    Game.mode = "dead";
+    Game.showMessage("You hit something. Press R to try again.");
+    return;
   }
 
-  // --- 5. move up or down, one pixel at a time ------------------------
-  var stepY = 0;
-  if (Player.vy > 0) { stepY = 1; }
-  if (Player.vy < 0) { stepY = -1; }
-
-  Player.onGround = false;
-
-  for (var j = 0; j < Math.abs(Player.vy); j++) {
-    if (Collide.hitsSolid(Player.x, Player.y + stepY, size, size)) {
-      if (stepY > 0) { Player.onGround = true; }  // we landed on something
-      Player.vy = 0;
-      break;
-    }
-    Player.y = Player.y + stepY;
+  if (Player.hasWon()) {
+    Game.mode = "won";
+    Game.showMessage("You made it. Press R to play again.");
+    return;
   }
-
-  // --- 6. keep the player inside the left edge of the world -----------
-  if (Player.x < 0) { Player.x = 0; }
 };
 
-// Did the player just touch something deadly?
-Player.isDead = function () {
-  var size = CONFIG.PLAYER_SIZE;
-  if (Collide.hitsSpike(Player.x, Player.y, size, size)) { return true; }
-  if (Player.y > CONFIG.CANVAS_H + 200) { return true; }   // fell off the world
-  return false;
-};
-
-// Did the player just reach the finish?
-Player.hasWon = function () {
-  var size = CONFIG.PLAYER_SIZE;
-  return Collide.hitsFinish(Player.x, Player.y, size, size);
+// --- THE LOOP ITSELF --------------------------------------------------
+Game.loop = function () {
+  Game.update();
+  Draw.updateCamera();
+  Draw.everything();
+  window.requestAnimationFrame(Game.loop);
 };
