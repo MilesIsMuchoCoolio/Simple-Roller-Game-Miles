@@ -1,63 +1,38 @@
-/* =====================================================================
-   collide.js  --  DID THE PLAYER TOUCH SOMETHING?
+var Game = { mode: "playing", levelNumber: 0, score: 0 };
 
-   The player is a BOX for collision, even though it is drawn as a
-   circle. Boxes are much easier to check, and nobody can tell.
-
-   Every function here answers one yes-or-no question about a box.
-   ===================================================================== */
-
-var Collide = {};
-
-// Which grid squares does this box overlap?
-// Returns a list of { col: , row: } objects.
-Collide.squaresUnder = function (x, y, width, height) {
-  var firstCol = Math.floor(x / CONFIG.TILE);
-  var lastCol  = Math.floor((x + width  - 1) / CONFIG.TILE);
-  var firstRow = Math.floor(y / CONFIG.TILE);
-  var lastRow  = Math.floor((y + height - 1) / CONFIG.TILE);
-
-  var squares = [];
-  for (var row = firstRow; row <= lastRow; row++) {
-    for (var col = firstCol; col <= lastCol; col++) {
-      squares.push({ col: col, row: row });
-    }
-  }
-  return squares;
+Game.startLevel = function (levelNumber) {
+  Game.levelNumber = levelNumber;
+  Level.build(levelNumber);
+  Crumble.reset();
+  Combat.reset();
+  Player.reset();
+  Game.score = 0;
+  Game.mode = "playing";
+  Game.showMessage("");
+  Game.updateHUD();
 };
-
-// Is this box inside a solid block?
-Collide.hitsSolid = function (x, y, width, height) {
-  var squares = Collide.squaresUnder(x, y, width, height);
-  for (var i = 0; i < squares.length; i++) {
-    if (Level.isSolid(squares[i].col, squares[i].row)) { return true; }
-  }
-  return false;
+Game.showMessage = function (text) { document.getElementById("message").textContent = text; };
+Game.updateHUD = function () {
+  var label = document.getElementById("score");
+  if (!label) { return; }
+  var reload = Combat.reloadTimer > 0 ? " | RELOADING" : "";
+  label.textContent = "Coins: " + Game.score + " | Ammo: " + Combat.ammo + "/" + Combat.reserve + reload;
 };
-
-// Is this box touching a spike?
-Collide.hitsSpike = function (x, y, width, height) {
-  var squares = Collide.squaresUnder(x, y, width, height);
-  for (var i = 0; i < squares.length; i++) {
-    if (Level.isSpike(squares[i].col, squares[i].row)) { return true; }
+Game.update = function () {
+  if (Input.restart) { Game.startLevel(Game.levelNumber); return; }
+  if (Game.mode !== "playing") { return; }
+  Player.update();
+  Player.collectCoins();
+  Combat.update();
+  Crumble.update();
+  if (Player.isDead()) {
+    Game.mode = "dead";
+    Game.showMessage("An enemy got you. Press R to try again.");
+  } else if (Player.hasWon()) {
+    Game.mode = "won";
+    Game.showMessage("You made it. Press R to play again.");
   }
-  return false;
 };
-
-// Is this box touching a coin?
-Collide.hitsCoin = function (x, y, width, height) {
-  var squares = Collide.squaresUnder(x, y, width, height);
-  for (var i = 0; i < squares.length; i++) {
-    if (Level.isCoin(squares[i].col, squares[i].row)) { return true; }
-  }
-  return false;
-};
-
-// Is this box touching the finish?
-Collide.hitsFinish = function (x, y, width, height) {
-  var squares = Collide.squaresUnder(x, y, width, height);
-  for (var i = 0; i < squares.length; i++) {
-    if (Level.isFinish(squares[i].col, squares[i].row)) { return true; }
-  }
-  return false;
+Game.loop = function () {
+  Game.update(); Draw.updateCamera(); Draw.everything(); window.requestAnimationFrame(Game.loop);
 };
