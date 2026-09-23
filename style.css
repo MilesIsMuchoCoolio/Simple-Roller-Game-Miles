@@ -1,1 +1,53 @@
-body{background:#356b2f;color:#fff;font-family:monospace;text-align:center;margin:24px}h1{letter-spacing:6px;font-size:24px;text-shadow:2px 2px #173b19}.status{font-weight:bold;color:#d7f5c8}canvas{border:3px solid #173b19;background:#9bd36a;display:block;margin:auto;box-shadow:0 4px 14px #173b19}#score{font-weight:bold;font-size:18px}.controls{font-size:13px}
+/* =====================================================================
+   style.css  --  how the PAGE looks. Not how the GAME looks.
+   The game is drawn in js/draw.js. This file is just the page around it.
+   ===================================================================== */
+
+body {
+  background: linear-gradient(#d9f7a6, #b7d96e);
+  color: #1c3b16;
+  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+  text-align: center;
+  margin: 24px;
+}
+
+h1 {
+  letter-spacing: 6px;
+  font-size: 30px;
+  margin-bottom: 16px;
+  color: #fddc5c;
+  text-shadow: 2px 2px 0 #1f5e2d, 4px 4px 0 #183d22;
+}
+
+canvas {
+  border: 4px solid #254c2c;
+  background: #cfeea1;
+  display: block;
+  margin: 0 auto;
+  box-shadow: 0 12px 0 rgba(21, 58, 24, 0.3);
+}
+
+#status,
+#score,
+#message {
+  font-weight: bold;
+  color: #ffffff;
+  text-shadow: 2px 2px 0 #264d21;
+}
+
+#message {
+  font-size: 18px;
+  height: 24px;
+  margin-top: 16px;
+}
+
+.controls {
+  font-size: 13px;
+  font-weight: bold;
+  color: #244b1f;
+  letter-spacing: 0.04em;
+}
+
+.status {
+  margin-bottom: 10px;
+}
