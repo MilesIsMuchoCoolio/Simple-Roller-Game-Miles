@@ -1,7 +1,16 @@
 {
   "levels": [
-    {"name":"Level 1 - Long Run","pieces":["start","coin","enemy","ammo","crumble","spikes","crumble_bridge","flat","enemy","coin","gap","spikes_wide","ammo","crumble","spike_gap","platform","enemy","stairs","crumble_bridge","spikes","flat","coin","gap_wide","ammo","crumble","spikepit","enemy","crumble_bridge","spikes_wide","flat","coin","stairs","crumble","spikes","ammo","enemy","gap","crumble_bridge","platform","spikes_wide","coin","finish"]},
-    {"name":"Level 2 - Long Watch Your Step","pieces":["start","enemy","coin","spikes","ammo","crumble","spikes_wide","gap","enemy","crumble_bridge","gap_wide","step","double_step","ammo","spikepit","crumble","platform","enemy","gap","flat","spikes","crumble_bridge","coin","stairs","ammo","spikes_wide","enemy","crumble","gap_wide","spike_gap","platform","crumble_bridge","spikes","enemy","flat","coin","stairs","crumble","ammo","finish"]},
-    {"name":"Level 3 - Long Crumble Run","pieces":["start","coin","crumble_bridge","enemy","spikes_wide","gap","ammo","spike_gap","crumble","wallstep","enemy","coin","double_step","spikepit","gap_wide","stairs","ammo","crumble_bridge","spikes","enemy","crumble","platform","spikes_wide","coin","gap","ammo","crumble_bridge","wallstep","enemy","spikepit","crumble","stairs","spikes","coin","gap_wide","ammo","crumble_bridge","enemy","spikes_wide","crumble","flat","finish"]}
+    {
+      "name": "Level 1 - Long Run",
+      "pieces": ["start","enemy","crumble","spikes","crumble_bridge","flat","enemy","gap","spikes_wide","ammo","spike_gap","platform","enemy","stairs","crumble_bridge","spikes","flat","gap_wide","crumble","enemy","spikes","finish"]
+    },
+    {
+      "name": "Level 2 - Long Watch Your Step",
+      "pieces": ["start","enemy","spikes","crumble","spikes_wide","gap","enemy","crumble_bridge","gap_wide","step","double_step","ammo","spikepit","crumble","platform","enemy","gap","flat","spikes","crumble_bridge","stairs","finish"]
+    },
+    {
+      "name": "Level 3 - Long Crumble Run",
+      "pieces": ["start","crumble_bridge","enemy","spikes_wide","gap","spike_gap","crumble","wallstep","enemy","double_step","spikepit","gap_wide","stairs","ammo","crumble_bridge","spikes","enemy","crumble","platform","spikes_wide","flat","finish"]
+    }
   ]
 }
