@@ -17,15 +17,21 @@ Level.loadData = function (done) {
     .then(function (pieces) {
       Level.pieces = pieces;
       Level.setStatus("Loading levels...");
-      return fetch("data/levels.json", { cache: "no-store" });
+      return Promise.all([
+        fetch("data/levels.json", { cache: "no-store" }),
+        fetch("data/extra-levels.json", { cache: "no-store" })
+      ]);
     })
-    .then(function (response) {
-      if (!response.ok) throw new Error("levels.json returned HTTP " + response.status);
-      return response.json();
+    .then(function (responses) {
+      for (var i = 0; i < responses.length; i++) {
+        if (!responses[i].ok) throw new Error("Level data returned HTTP " + responses[i].status);
+      }
+      return Promise.all([responses[0].json(), responses[1].json()]);
     })
-    .then(function (file) {
-      if (!file.levels || !file.levels.length) throw new Error("levels.json contains no levels");
-      Level.levels = file.levels;
+    .then(function (files) {
+      if (!files[0].levels || !files[0].levels.length) throw new Error("levels.json contains no levels");
+      if (!files[1].levels || !files[1].levels.length) throw new Error("extra-levels.json contains no levels");
+      Level.levels = files[0].levels.concat(files[1].levels);
       Level.setStatus("Level data loaded.");
       done();
     })
