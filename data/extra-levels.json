@@ -1,0 +1,16 @@
+{
+  "levels": [
+    {
+      "name": "Level 4 - Shaky Crossing",
+      "pieces": ["start", "coin", "enemy", "flat", "crumble_bridge", "spikes", "ammo", "gap", "enemy", "platform", "crumble", "flat", "spikes_wide", "crumble_bridge", "enemy", "stairs", "gap", "finish"]
+    },
+    {
+      "name": "Level 5 - Enemy Alley",
+      "pieces": ["start", "enemy", "crumble", "spikes", "coin", "gap_wide", "enemy", "crumble_bridge", "ammo", "step", "spike_gap", "enemy", "platform", "crumble", "double_step", "crumble_bridge", "spikes", "finish"]
+    },
+    {
+      "name": "Level 6 - Final Crumble",
+      "pieces": ["start", "crumble_bridge", "enemy", "spikepit", "flat", "crumble", "enemy", "gap", "ammo", "spikes_wide", "crumble_bridge", "wallstep", "enemy", "gap_wide", "crumble", "stairs", "spike_gap", "finish"]
+    }
+  ]
+}
