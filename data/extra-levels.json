@@ -6,11 +6,11 @@
     },
     {
       "name": "Level 5 - Enemy Alley",
-      "pieces": ["start", "enemy", "crumble", "spikes", "coin", "gap_wide", "enemy", "crumble_bridge", "ammo", "step", "spike_gap", "enemy", "platform", "crumble", "double_step", "crumble_bridge", "spikes", "finish"]
+      "pieces": ["start", "enemy", "crumble", "spikes", "coin", "gap_wide", "enemy", "crumble_bridge", "ammo", "step", "spike_gap", "enemy", "platform", "crumble", "double_step", "crumble_bridge", "stairs", "finish"]
     },
     {
       "name": "Level 6 - Final Crumble",
-      "pieces": ["start", "crumble_bridge", "enemy", "spikepit", "flat", "crumble", "enemy", "gap", "ammo", "spikes_wide", "crumble_bridge", "wallstep", "enemy", "gap_wide", "crumble", "stairs", "spike_gap", "finish"]
+      "pieces": ["start", "flat", "enemy", "flat", "ammo", "flat", "enemy", "flat", "enemy", "ammo", "flat", "enemy", "flat", "enemy", "ammo", "flat", "enemy", "flat", "enemy", "ammo", "flat", "enemy", "flat", "enemy", "ammo", "platform", "enemy", "flat", "stairs", "finish"]
     }
   ]
 }
