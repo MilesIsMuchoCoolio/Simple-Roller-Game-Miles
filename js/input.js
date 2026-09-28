@@ -1,4 +1,55 @@
-var Input={left:false,right:false,jump:false,restart:false,shoot:false,reload:false,mouseX:400,mouseY:200};
-window.addEventListener("keydown",function(e){setKey(e.key,true);if(["ArrowLeft","ArrowRight","ArrowUp"," "].indexOf(e.key)>=0)e.preventDefault();});window.addEventListener("keyup",function(e){setKey(e.key,false);});
-function setKey(k,d){if(k==="ArrowLeft"||k==="a"||k==="A")Input.left=d;if(k==="ArrowRight"||k==="d"||k==="D")Input.right=d;if(k==="ArrowUp"||k===" "||k==="w"||k==="W")Input.jump=d;if(k==="t"||k==="T")Input.restart=d;if(k==="r"||k==="R")Input.reload=d;if(k==="m"||k==="M")Input.shoot=d;}
-window.addEventListener("mousemove",function(e){var c=document.getElementById("game"),b=c.getBoundingClientRect();Input.mouseX=(e.clientX-b.left)*c.width/b.width;Input.mouseY=(e.clientY-b.top)*c.height/b.height;});window.addEventListener("click",function(){Input.shoot=true;});
+var Input = {
+  left: false,
+  right: false,
+  jump: false,
+  restart: false,
+  shoot: false,
+  reload: false,
+  mouseX: 400,
+  mouseY: 200
+};
+
+window.addEventListener("keydown", function (event) {
+  setKey(event.key, true);
+  if (["ArrowLeft", "ArrowRight", "ArrowUp", " "].indexOf(event.key) >= 0) {
+    event.preventDefault();
+  }
+});
+
+window.addEventListener("keyup", function (event) {
+  setKey(event.key, false);
+});
+
+function setKey(key, down) {
+  if (key === "ArrowLeft" || key === "a" || key === "A") {
+    Input.left = down;
+  }
+  if (key === "ArrowRight" || key === "d" || key === "D") {
+    Input.right = down;
+  }
+  if (key === "ArrowUp" || key === " " || key === "w" || key === "W") {
+    Input.jump = down;
+  }
+  if (key === "t" || key === "T") {
+    Input.restart = down;
+  }
+  if (key === "r" || key === "R") {
+    Input.reload = down;
+  }
+}
+
+var canvas = document.getElementById("game");
+
+window.addEventListener("mousemove", function (event) {
+  var canvasRect = canvas.getBoundingClientRect();
+  Input.mouseX = (event.clientX - canvasRect.left) * canvas.width / canvasRect.width;
+  Input.mouseY = (event.clientY - canvasRect.top) * canvas.height / canvasRect.height;
+});
+
+canvas.addEventListener("mousedown", function (event) {
+  Input.shoot = true;
+});
+
+canvas.addEventListener("mouseup", function (event) {
+  Input.shoot = false;
+});
