@@ -65,7 +65,7 @@ Game.update = function () {
 
   if (Player.isDead()) {
     Game.mode = "dead";
-    Game.showMessage("You were hit! Press R to restart.");
+    Game.showMessage("You were hit! Press T to restart.");
     return;
   }
 
@@ -74,7 +74,7 @@ Game.update = function () {
     if (Game.levelNumber < Level.levels.length - 1) {
       Game.showMessage("Level complete! Choose the next level above or press N.");
     } else {
-      Game.showMessage("You beat every level! Press R to play again.");
+      Game.showMessage("You beat every level! Press T to play again.");
     }
   }
 };
