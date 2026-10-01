@@ -39,10 +39,13 @@ Collide.hitsSpike = function (x, y, w, h) {
 
     var tileX = square.col * CONFIG.TILE;
     var tileY = square.row * CONFIG.TILE;
-    var spikeLeft = tileX + 5;
-    var spikeRight = tileX + CONFIG.TILE - 5;
-    var spikeTop = tileY + 12;
-    var spikeBottom = tileY + CONFIG.TILE - 2;
+    // Improved spike hitbox: tighter to the actual spike triangle
+    // Spike draws from (x, y+s) to (x+s/2, y) to (x+s, y+s)
+    // Hitbox is narrower at top and wider at bottom
+    var spikeLeft = tileX + 8;
+    var spikeRight = tileX + CONFIG.TILE - 8;
+    var spikeTop = tileY + 8;
+    var spikeBottom = tileY + CONFIG.TILE;
 
     if (x < spikeRight && x + w > spikeLeft && y < spikeBottom && y + h > spikeTop) {
       return true;
